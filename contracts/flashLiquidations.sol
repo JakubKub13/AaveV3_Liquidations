@@ -146,6 +146,38 @@ contract FlashLiquidations is FlashLoanSimpleReceiverBase, Ownable {
         console.log("Collateral balance after", collateralBalanceAfter);
         variables.diffCollateralBalance = collateralBalanceAfter - variables.initCollateralBalance;
         console.log("Difference", variables.diffCollateralBalance);
+
+        // Calculate the swap and necessary collateral tokens to repay flashLoan
+        if(collateralAsset != borrowedAsset) {
+            uint256 flashBorrowedAssetAfter = IERC20(borrowedAsset).balanceOf(address(this));
+            console.log("Flash borrowed asset after", flashBorrowedAssetAfter);
+            variables.diffFlashBorrowedBalance = flashBorrowedAssetAfter - variables.borrowedAssetLeftovers;
+            console.log("Difference", variables.diffFlashBorrowedBalance);
+            uint256 amountOut = variables.flashLoanDebt - variables.diffFlashBorrowedBalance;
+            console.log("Debt tokens I want to receive", amountOut);
+            console.log("Swapping collateral to debt");
+            
+            variables.soldAmount = swapExactOutputSingle(
+                collateralAsset,
+                borrowedAsset,
+                amountOut,
+                variables.diffCollateralBalance,
+                poolFee1,
+                poolFee2,
+                pathToken,
+                usePath
+            );
+
+            // Check for tokens to transfer to contract owner
+            console.log("Remaining collateral");
+            variables.remainingTokens = variables.diffCollateralBalance - variables.soldAmount;
+            console.log("Error");
+        } else {
+            variables.remainingTokens = variables.diffCollateralBalance - premium;
+        }
+
+        // Approve for flash loan repayment
+        IERC20(borrowedAsset).approve(address(POOL), variables.flashLoanDebt);  
     }
 
     /**
