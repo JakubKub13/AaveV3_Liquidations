@@ -84,6 +84,21 @@ contract FlashLiquidations is FlashLoanSimpleReceiverBase, Ownable {
     }
 
     /**
+     * @notice Executes the operation of liquidating the debt position after it swaps collateral asset back to asset borrowed via flashloan
+     * @dev Pool contract must be approved for operations
+     * @param collateralAsset -> Address of asset received from the liquidation
+     * @param borrowedAsset -> Address of the asset borrowed via flashloan
+     * @param user -> address of the user being liquidated
+     * @param debtToCover -> amount of the debt to be liauidated
+     * @param poolFee1 -> fee connected to uniswap pool
+     * @param poolFee2 -> fee connected to uniswap pool
+     * @param pathToken -> token which in case needs to be swap between two other tokens from the uniswap pool
+     * @param usePath -> decicion whether to use single or multihop uniswap swap
+     * @param flashBorrowedAmount -> amount that was borrowed via flashloan
+     * @param premium -> fee for taking out flashloan
+     */
+
+    /**
      * @notice This func decodes the params obtained from myFlashLoan function
      * @param params -> params encoded in bytes form passed when initialize the flashloan
      * @return LiquidationParams memory struct
