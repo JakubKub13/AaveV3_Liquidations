@@ -181,6 +181,15 @@ contract FlashLiquidations is FlashLoanSimpleReceiverBase, Ownable {
     }
 
     /**
+     * @notice This function swaps a minimum possible amount of DAI for fixed amount WETH
+     * @dev Calling address must approve this contract to spend DAI for this function to succeed will need to approve for slightly higher amount
+     * @param amountOut -> exact amount of WETH to receive from the swap
+     * @param amountInMaximum -> amount of DAI we want to spend to receive the specified amount of WETH
+     * @return amountIn -> amount of DAI accualy spent in swap
+     */
+    function swapExactOutputSingle();
+
+    /**
      * @notice This func decodes the params obtained from myFlashLoan function
      * @param params -> params encoded in bytes form passed when initialize the flashloan
      * @return LiquidationParams memory struct
@@ -208,6 +217,4 @@ contract FlashLiquidations is FlashLoanSimpleReceiverBase, Ownable {
             usePath
         );
     }
-
-
 }
