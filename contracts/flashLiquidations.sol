@@ -124,6 +124,19 @@ contract FlashLiquidations is FlashLoanSimpleReceiverBase, Ownable {
             variables.borrowedAssetLeftovers = variables.initFlashBorrowedBalance - flashBorrowedAmount;
             console.log("Borrowed asset leftovers", variables.borrowedAssetLeftovers);
         }
+
+        // Calculate the amount which will be send back to Aave pool
+        variables.flashLoanDebt = flashBorrowedAmount + premium;
+        console.log("FlashLoan debt", variables.flashLoanDebt);
+        console.log("Approving liquidation");
+
+        // Approve the pool to liquidate debt position
+        require(IERC20(borrowedAsset).approve(address(POOL), debtToCover), "FlashLiquidations: Error while approving");
+        console.log("Liquidation in process");
+        console.log(debtToCover);
+
+        // Liquidating the debt possition
+        
     }
 
     /**
