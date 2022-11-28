@@ -41,4 +41,10 @@ contract FlashLiquidations is FlashLoanSimpleReceiverBase, Ownable {
     }
 
     ISwapRouter public immutable swapRouter;
+
+    constructor(IPoolAddressesProvider _addressProvider, ISwapRouter _swapRouter) FlashLoanSimpleReceiverBase(_addressProvider) {
+        swapRouter = ISwapRouter(_swapRouter);
+    }
+
+    
 }
