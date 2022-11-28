@@ -97,6 +97,34 @@ contract FlashLiquidations is FlashLoanSimpleReceiverBase, Ownable {
      * @param flashBorrowedAmount -> amount that was borrowed via flashloan
      * @param premium -> fee for taking out flashloan
      */
+    function _liquidateAndSwap(
+        address collateralAsset,
+        address borrowedAsset,
+        address user,
+        uint256 debtToCover,
+        uint24 poolFee1,
+        uint24 poolFee2,
+        address pathToken,
+        bool usePath,
+        uint256 flashBorrowedAmount,
+        uint256 premium
+    ) internal {
+        // Approval for router to spend `amountInMaximum` of colateral
+        // In prod the max amount should be spend based on oracles or other data sources to acheive better swap 
+        LiquidationCallLocalVars memory variables;
+
+        // Initial collateral balance
+        variables.initCollateralBalance = IERC20(collateralAsset).balanceOf(address(this));
+        console.log("Initial collateral balance", variables.initCollateralBalance);
+
+        // Check whether the initial balance of tokens was borrowed
+        if(collateralAsset != borrowedAsset) {
+            variables.initFlashBorrowedBalance = IERC20(borrowedAsset).balanceOf(address(this));
+            console.log("Initial flash Loan borrowed balance", variables.initFlashBorrowedBalance);
+            variables.borrowedAssetLeftovers = variables.initFlashBorrowedBalance - flashBorrowedAmount;
+            console.log("Borrowed asset leftovers", variables.borrowedAssetLeftovers);
+        }
+    }
 
     /**
      * @notice This func decodes the params obtained from myFlashLoan function
