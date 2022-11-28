@@ -136,7 +136,16 @@ contract FlashLiquidations is FlashLoanSimpleReceiverBase, Ownable {
         console.log(debtToCover);
 
         // Liquidating the debt possition
-        
+        POOL.liquidationCall(collateralAsset, borrowedAsset, user, debtToCover, false);
+        console.log("Liquidated");
+
+        // Compare initial collateral balance with collateral balance after liquidation
+        uint256 collateralBalanceAfter = IERC20(collateralAsset).balanceOf(address(this));
+        uint256 debtBalanceAfter = IERC20(borrowedAsset).balanceOf(address(this));
+        console.log("Debt balance after", debtBalanceAfter);
+        console.log("Collateral balance after", collateralBalanceAfter);
+        variables.diffCollateralBalance = collateralBalanceAfter - variables.initCollateralBalance;
+        console.log("Difference", variables.diffCollateralBalance);
     }
 
     /**
