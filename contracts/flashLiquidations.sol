@@ -46,5 +46,42 @@ contract FlashLiquidations is FlashLoanSimpleReceiverBase, Ownable {
         swapRouter = ISwapRouter(_swapRouter);
     }
 
-    
+    /**
+     * @notice This function executes the operation after receiving assets in form of Flash loan
+     * @dev Must be ensured that contract can return debt + premium
+     * @param asset -> the address of flash-borrowed asset
+     * @param amount -> the amount of the flash-borrowed asset
+     * @param premium -> fee for flashloan
+     * @param params -> The byte-encoded params passed when init flashloan
+     * @return true if execution of operation seccess, else false
+     */
+    function executeOperation(
+        address asset,
+        uint256 amount,
+        uint256 premium,
+        address initiator,
+        bytes calldata params
+    ) external override returns (bool) {
+        require(msg.sender == address(POOL), "FlashLiquidations: Caller must be lending pool");
+
+        LiquidationParams memory decodedParams = _decodeParams(params);
+
+        require(asset == decodedParams.borrowedAsset, "FlashLiquidations: Wrong params passed - asset not the same");
+        console.log("Trying to liquidate and swap");
+        _liquidateAndSwap(
+            decodedParams.collateralAsset,
+            decodedParams.borrowedAsset,
+            decodedParams.user,
+            decodedParams.debtToCover,
+            decodedParams.poolFee1,
+            decodedParams.poolFee2,
+            decodedParams.pathToken,
+            decodedParams.usePath,
+            amount,
+            premium
+        );
+        return true;
+    }
+
+
 }
