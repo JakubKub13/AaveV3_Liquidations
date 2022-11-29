@@ -267,4 +267,17 @@ contract FlashLiquidations is FlashLoanSimpleReceiverBase, Ownable {
             usePath
         );
     }
+
+    /**
+     * @notice flashLoan func initialize a flashLoanSimple and passes the parameters needed to liquidate a position than transfers the collateral received to the owner of contract
+     * @param tokenAddress -> address of flash loaned token
+     * @param _amount -> amount of flash loaned token
+     * @param colToken -> address of collateral token received from liquidating the position
+     * @param user -> address of the user whose position is being liquidated
+     * @param decimals -> amount of decimals for the (debt token)
+     * @param poolFee1 -> fee associated with Uniswap Pool
+     * @param poolFee2 -> fee associated with Uniswap Pool
+     * @param pathToken -> token needed to be swap between tokens
+     * @param usePath -> bool to decide between single and multihop swap
+     */
 }
