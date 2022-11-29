@@ -307,5 +307,23 @@ contract FlashLiquidations is FlashLoanSimpleReceiverBase, Ownable {
             usePath
         );
         console.log(amount);
+
+        // Init flashLoanSimple
+        POOL.flashLoanSimple(receiverAddress, asset, amount, params, referralCode);
+
+        // Transfering remaining collateral token after liquidation with flashloan being repaid
+        LiquidationParams memory decodedParams = _decodeParams(params);
+        console.log("Flash loan is being repaid, transfering remaining collateral tokens");
+        // Transfer remaining debt and collateral to msg.sender 
+        uint256 allBalance = IERC20(decodedParams.collateralAsset).balanceOf(address(this));
+        uint256 debtTokensRemaining = IERC20(decodedParams.borrowedAsset).balanceOf(address(this));
+        console.log("Remaining debt", debtTokensRemaining);
+        if(debtTokensRemaining > 0) {
+            IERC20(decodedParams.borrowedAsset).transfer(msg.sender, debtTokensRemaining);
+        }
+        console.log(decodedParams.collateralAsset, allBalance);
+        IERC20(decodedParams.collateralAsset).transfer(msg.sender, allBalance);
+        uint256 userBalance = IERC20(decodedParams.collateralAsset).balanceOf(msg.sender);
+        console.log("User balance", userBalance);
     }
 }
