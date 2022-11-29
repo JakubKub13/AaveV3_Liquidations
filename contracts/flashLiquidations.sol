@@ -187,7 +187,50 @@ contract FlashLiquidations is FlashLoanSimpleReceiverBase, Ownable {
      * @param amountInMaximum -> amount of DAI we want to spend to receive the specified amount of WETH
      * @return amountIn -> amount of DAI accualy spent in swap
      */
-    function swapExactOutputSingle();
+    function swapExactOutputSingle(
+        address tokenIn,
+        address tokenOut,
+        uint256 amountOut,
+        uint256 amountInMaximum,
+        uint24 poolFee1,
+        uint24 poolFee2,
+        address pathToken,
+        bool usePath
+    ) internal returns (uint256 amountIn) {
+        console.log("Approving unisap router to spend collateral tokens");
+        console.log("Amount to be approved", amountInMaximum);
+        TransferHelper.safeApprove(tokenIn, address(swapRouter), amountInMaximum);
+        require(IERC20(tokenIn).allowance(address(this), address(swapRouter)) == amountInMaximum, "FlashLiquidations: error while approving");
+
+        if(usePath == false) {
+            ISwapRouter.ExactOutputSingleParams memory params = ISwapRouter
+                .ExactOutputSingleParams({
+                    tokenIn: tokenIn,
+                    tokenOut: tokenOut,
+                    fee: poolFee1,
+                    recipient: address(this),
+                    deadline: block.timestamp,
+                    amountOut: amountOut,
+                    amountInMaximum: amountInMaximum,
+                    sqrtPriceLimitX96: 0
+                });
+            console.log("Getting debt tokens to repay flashLoan");
+            console.log("Collateral balance", IERC20(tokenIn).balanceOf(address(this)));
+            amountIn = swapRouter.exactOutputSingle(params);
+        } else {
+            ISwapRouter.ExactOutputParams memory params = ISwapRouter
+                .ExactOutputParams({
+                    path: abi.encodePacked(tokenOut, poolFee2, pathToken, poolFee1, tokenIn),
+                    recipient: address(this),
+                    deadline: block.timestamp,
+                    amountOut: amountOut,
+                    amountInMaximum: amountInMaximum
+                });
+            console.log("Getting debt tokens to repay flashLoan");
+            console.log("Collateral balance, IERC20(tokenIn");
+
+        }
+    }
 
     /**
      * @notice This func decodes the params obtained from myFlashLoan function
