@@ -227,9 +227,16 @@ contract FlashLiquidations is FlashLoanSimpleReceiverBase, Ownable {
                     amountInMaximum: amountInMaximum
                 });
             console.log("Getting debt tokens to repay flashLoan");
-            console.log("Collateral balance, IERC20(tokenIn");
-
+            console.log("Collateral balance", IERC20(tokenIn).balanceOf(address(this)));
+            amountIn = swapRouter.exactOutput(params);
         }
+        console.log("Removing approval from swapRouter");
+        if(amountIn < amountInMaximum) {
+            TransferHelper.safeApprove(tokenIn, address(swapRouter), 0);
+        }
+        console.log("Approval reset");
+        console.log(amountIn);
+        return amountIn;
     }
 
     /**
