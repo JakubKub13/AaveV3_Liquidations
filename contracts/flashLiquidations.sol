@@ -280,4 +280,32 @@ contract FlashLiquidations is FlashLoanSimpleReceiverBase, Ownable {
      * @param pathToken -> token needed to be swap between tokens
      * @param usePath -> bool to decide between single and multihop swap
      */
+    function flashLoan(
+        address tokenAddress,
+        uint256 _amount,
+        address colToken,
+        address user,
+        uint256 decimals,
+        uint24 poolFee1,
+        uint24 poolFee2,
+        address pathToken,
+        bool usePath
+    ) external onlyOwner {
+        address receiverAddress = address(this);
+        address asset = tokenAddress;
+        uint256 amount = _amount / 10**(18 - decimals);
+        uint16 referralCode = 0;
+        
+        bytes memory params = abi.encode(
+            colToken,
+            asset,
+            user,
+            amount,
+            poolFee1,
+            poolFee2,
+            pathToken,
+            usePath
+        );
+        console.log(amount);
+    }
 }
